@@ -1,0 +1,39 @@
+const express = require("express");
+const axios = require("axios");
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Middleware to serve static files
+app.use(express.static("client"));
+
+// Route to search images
+app.get("/api/search", async (req, res) => {
+  const query = req.query.q;
+  const page = req.query.page || 1;
+  try {
+    const response = await axios.get(
+      `https://image-search-abstraction-layer.freecodecamp.rocks/query/${encodeURIComponent(
+        query
+      )}?page=${page}`
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).send("Error fetching data");
+  }
+});
+
+// Route to get recent search queries
+app.get("/api/recent", async (req, res) => {
+  try {
+    const response = await axios.get(
+      "https://image-search-abstraction-layer.freecodecamp.rocks/recent/"
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).send("Error fetching data");
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
